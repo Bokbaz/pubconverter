@@ -273,8 +273,52 @@ input {
 
 .action-row {
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 16px;
+}
+
+.run-mode {
+  display: inline-flex;
+  min-height: 40px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fbfcfb;
+}
+
+.run-mode-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 104px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  padding: 9px 12px;
+  color: var(--muted);
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.run-mode-button:last-child {
+  border-right: 0;
+}
+
+.run-mode-button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.run-mode-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.run-mode-selected {
+  color: #fff;
+  background: var(--brand);
 }
 
 .message {
@@ -517,5 +561,15 @@ input {
 
   .drop-actions .button {
     flex: 1;
+  }
+
+  .run-mode,
+  .action-row > .button {
+    width: 100%;
+  }
+
+  .run-mode-button {
+    flex: 1;
+    min-width: 0;
   }
 }

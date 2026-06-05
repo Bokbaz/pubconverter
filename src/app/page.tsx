@@ -8,8 +8,10 @@ import {
   FileArchive,
   FileText,
   FolderUp,
+  ListStart,
   Loader2,
   RefreshCcw,
+  ServerCog,
   Upload,
 } from "lucide-react";
 import { ChangeEvent, DragEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -29,6 +31,7 @@ type Health = {
 };
 
 type JobStatus = "idle" | "uploading" | "queued" | "processing" | "completed" | "failed";
+type RunMode = "native" | "queue";
 
 type JobFileReport = {
   sourcePath: string;
@@ -92,6 +95,7 @@ export default function Home() {
   const [files, setFiles] = useState<PickedFile[]>([]);
   const [selectedModes, setSelectedModes] = useState<OutputMode[]>(["archive-pdf"]);
   const [health, setHealth] = useState<Health | null>(null);
+  const [runMode, setRunMode] = useState<RunMode>("native");
   const [status, setStatus] = useState<JobStatus>("idle");
   const [message, setMessage] = useState<string>("");
   const [jobId, setJobId] = useState<string | null>(null);
@@ -214,6 +218,11 @@ export default function Home() {
     formData.append("modes", JSON.stringify(selectedModes));
 
     try {
+      if (runMode === "native") {
+        await runDirectConversion(formData);
+        return;
+      }
+
       const queued = await fetch("/api/jobs", {
         method: "POST",
         body: formData,
@@ -233,11 +242,7 @@ export default function Home() {
       setJobId(data.jobId);
       setStatus(data.status);
       setReport(data.report ?? null);
-      setMessage(
-        data.status === "completed"
-          ? "Conversion complete."
-          : "Job queued. The worker will process it and this page will update automatically.",
-      );
+      setMessage(data.status === "completed" ? "Conversion complete." : "Job queued for worker processing.");
       if (data.downloadUrl) {
         setDownloadUrl(data.downloadUrl);
       }
@@ -366,6 +371,27 @@ export default function Home() {
           </div>
 
           <div className="action-row">
+            <div className="run-mode" role="group" aria-label="Run mode">
+              <button
+                className={`run-mode-button ${runMode === "native" ? "run-mode-selected" : ""}`}
+                type="button"
+                onClick={() => setRunMode("native")}
+                aria-pressed={runMode === "native"}
+              >
+                <ServerCog aria-hidden="true" />
+                Native
+              </button>
+              <button
+                className={`run-mode-button ${runMode === "queue" ? "run-mode-selected" : ""}`}
+                type="button"
+                onClick={() => setRunMode("queue")}
+                aria-pressed={runMode === "queue"}
+                disabled={!health?.jobs.enabled || !health?.jobs.supabaseConfigured}
+              >
+                <ListStart aria-hidden="true" />
+                Queue
+              </button>
+            </div>
             <button className="button primary" type="button" onClick={startConversion} disabled={status === "uploading" || status === "processing"}>
               {status === "uploading" || status === "processing" ? <Loader2 className="spin" aria-hidden="true" /> : <RefreshCcw aria-hidden="true" />}
               Convert

@@ -6,7 +6,7 @@ Publisher2X is a Vercel/Supabase-ready web tool for converting Microsoft Publish
 - Word DOCX: an honest, best-effort editable Word export with fidelity warnings.
 - Modern bundle: PDF, SVG where available, extracted image assets, and per-file reports for rebuilding in Canva, Affinity, Scribus, Inkscape, or similar tools.
 
-The app is intentionally structured around a worker. Vercel serves the UI and API, Supabase stores private uploads/results and job state, and the worker runs LibreOffice, which includes libmspub support for Publisher import.
+The app can run conversions directly from the website server process, or queue jobs for a separate worker. The native website path runs LibreOffice from the host machine, which includes libmspub support for Publisher import. Docker is only needed if you want the separate worker container.
 
 ## What is included
 
@@ -14,8 +14,8 @@ The app is intentionally structured around a worker. Vercel serves the UI and AP
 - Batch processing with relative folder paths preserved in the returned ZIP.
 - Three selectable output modes.
 - Per-file fidelity report in the UI and inside the ZIP.
-- Supabase-backed queue for production.
-- Direct conversion endpoint for local testing or a server that has LibreOffice installed.
+- Native website conversion endpoint for local testing or a server that has LibreOffice installed.
+- Optional Supabase-backed queue for worker-based production.
 - Worker script plus Dockerfile with LibreOffice and Poppler installed.
 - Private storage buckets and job tables.
 
@@ -33,7 +33,7 @@ Publisher is object-on-a-canvas. Word is text-in-a-flow. A perfect editable DOCX
 npm install
 ```
 
-3. Install LibreOffice.
+3. Install LibreOffice on the machine running the website server.
 
 Windows: install LibreOffice from the official installer, then set `LIBREOFFICE_PATH` if `soffice` is not on PATH.
 
@@ -70,7 +70,7 @@ npm run dev
 
 7. Open `http://localhost:3000`, upload a `.pub` file, select output modes, and click Convert.
 
-When Supabase jobs are disabled, the app falls back to `/api/convert` and returns a ZIP directly. This requires LibreOffice to be available to the server process.
+The Native run mode uses `/api/convert` and returns a ZIP directly from the website server process. This requires LibreOffice to be available to that process, but does not require Docker or a worker.
 
 ## Supabase setup
 
@@ -110,7 +110,7 @@ JOB_DELETE_AFTER_HOURS=24
 
 ## Worker setup
 
-The worker processes queued jobs from Supabase. It must run in an environment that can install LibreOffice and Poppler.
+The worker is optional. Use it only when you switch the website to Queue mode and want queued Supabase jobs processed outside the website server. It must run in an environment that can install LibreOffice and Poppler.
 
 ### Option A: Docker
 
@@ -157,9 +157,9 @@ JOB_DELETE_AFTER_HOURS=24
 
 3. Deploy.
 
-4. Start the worker separately using Docker or another Node-capable host with LibreOffice installed.
+4. Start the worker separately using Docker or another Node-capable host with LibreOffice installed if you plan to use Queue mode.
 
-Vercel should run the UI and queue API. The worker should run the native conversion pipeline.
+Vercel can run the UI and queue API. The worker should run the native conversion pipeline for Queue mode. Native mode still needs a host where the website server can execute LibreOffice.
 
 ## Privacy model
 
