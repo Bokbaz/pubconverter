@@ -1,0 +1,12 @@
+.next/
+node_modules/
+dist/
+coverage/
+.env
+.env*.local
+*.log
+tsconfig.tsbuildinfo
+tmp/
+out/
+uploads/
+results/

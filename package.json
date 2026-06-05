@@ -1,0 +1,30 @@
+{
+  "name": "pubconverter",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "worker": "tsx scripts/worker.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "jszip": "^3.10.1",
+    "lucide-react": "^0.468.0",
+    "next": "^15.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.0.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

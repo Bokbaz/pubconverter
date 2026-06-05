@@ -1,0 +1,8 @@
+node_modules/
+.next/
+dev-server.*.log
+tsconfig.tsbuildinfo
+tmp/
+out/
+uploads/
+results/
